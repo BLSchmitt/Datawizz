@@ -1,28 +1,43 @@
 <!DOCTYPE html>
 <html lang="fr">
-  <head>
+<head>
+  <meta charset="utf-8" />
+  <script type="text/javascript" src="d3/d3.min.js"></script>
+  <script type="text/javascript" src="jquery-3.3.1.slim.min.js"></script>
+  <script type="text/javascript" src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
 
-	<script type="text/javascript" src="d3/d3.min.js"></script>
-	<script type="text/javascript" src="jquery-3.3.1.slim.min.js"></script>
+  <style>
+  .axis path,
+  .axis line{
+    fill: none;
+    stroke: black;
+    shape-rendering : crispEdges;
+  }
 
-    <style>
-    .axis path,
-    .axis line{
-      fill: none;
-      stroke: black;
-      shape-rendering : crispEdges;
-    }
+  .axis text {
+    font-family : sans-sherif;
+    font-size= 11px;
+  }
 
-    .axis text {
-      font-family : sans-sherif;
-      font-size= 11px;
-    }
-    </style>
+  .d3-tip {
+    line-height: 1;
+    padding: 6px;
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+  .d3-tip.n:after {
+    margin: -2px 0 0 0;
+    top: 100%;
+    left: 0;
+  }
+  </style>
 
-  </head>
-  <body>
+</head>
+<body>
   <script>
-  var data = {"0169-1864": {"note": "3", "moyfideliteauteur": 0.5166666666666667, "titre_journal": "Advanced Robotics", "nbpubli": 1, "nbchercheur": 5}, "0741-2223": {"note": "3", "moyfideliteauteur": 0.55, "titre_journal": "Journal of Robotic Systems", "nbpubli": 2, "nbchercheur": 2}, "1552-3098": {"note": "1", "moyfideliteauteur": 0.7666666666666667, "titre_journal": "IEEE Transactions on Robotics", "nbpubli": 11, "nbchercheur": 20}, "1471-2105": {"note": "3", "moyfideliteauteur": 0.7625, "titre_journal": "BMC Bioinformatics", "nbpubli": 1, "nbchercheur": 4}, "1367-4803": {"note": "4", "moyfideliteauteur": 0.88125, "titre_journal": "Bioinformatics", "nbpubli": 1, "nbchercheur": 8}, "0736-5845": {"note": "2", "moyfideliteauteur": 0.5952380952380951, "titre_journal": "Robotics and Computer-Integrated Manufacturing", "nbpubli": 2, "nbchercheur": 7}, "1536-2310": {"note": "4", "moyfideliteauteur": 1.0, "titre_journal": "\u00e0 faire", "nbpubli": 1, "nbchercheur": 7}, "0278-3649": {"note": "1", "moyfideliteauteur": 0.7180555555555556, "titre_journal": "International Journal of Robotics Research", "nbpubli": 5, "nbchercheur": 12}, "0921-0296": {"note": "4", "moyfideliteauteur": 0.7625, "titre_journal": "Journal of Intelligent and Robotic Systems", "nbpubli": 1, "nbchercheur": 4}, "0018-9286": {"note": "1", "moyfideliteauteur": 1.0, "titre_journal": "IEEE Transactions on Automatic Control", "nbpubli": 2, "nbchercheur": 3}, "1729-8806": {"note": "3", "moyfideliteauteur": 0.7625, "titre_journal": "International Journal of Advanced Robotic Systems", "nbpubli": 1, "nbchercheur": 4}}
+  var data = {"0169-1864": {"note": "3", "moyfideliteauteur": 0.5166666666666667, "titre_journal": "Advanced Robotics", "nbpubli": 1, "nbchercheur": 5}, "0741-2223": {"note": "3", "moyfideliteauteur": 0.55, "titre_journal": "Journal of Robotic Systems", "nbpubli": 2, "nbchercheur": 2}, "1552-3098": {"note": "1", "moyfideliteauteur": 0.7666666666666667, "titre_journal": "IEEE Transactions on Robotics", "nbpubli": 11, "nbchercheur": 20}, "1471-2105": {"note": "3", "moyfideliteauteur": 0.7625, "titre_journal": "BMC Bioinformatics", "nbpubli": 1, "nbchercheur": 4}, "1367-4803": {"note": "4", "moyfideliteauteur": 0.88125, "titre_journal": "Bioinformatics", "nbpubli": 1, "nbchercheur": 8}, "0736-5845": {"note": "2", "moyfideliteauteur": 0.5952380952380951, "titre_journal": "Robotics and Computer-Integrated Manufacturing", "nbpubli": 2, "nbchercheur": 7}, "1536-2310": {"note": "4", "moyfideliteauteur": 1.0, "titre_journal": "A Journal of Integrative Biology", "nbpubli": 1, "nbchercheur": 7}, "0278-3649": {"note": "1", "moyfideliteauteur": 0.7180555555555556, "titre_journal": "International Journal of Robotics Research", "nbpubli": 5, "nbchercheur": 12}, "0921-0296": {"note": "4", "moyfideliteauteur": 0.7625, "titre_journal": "Journal of Intelligent and Robotic Systems", "nbpubli": 1, "nbchercheur": 4}, "0018-9286": {"note": "1", "moyfideliteauteur": 1.0, "titre_journal": "IEEE Transactions on Automatic Control", "nbpubli": 2, "nbchercheur": 3}, "1729-8806": {"note": "3", "moyfideliteauteur": 0.7625, "titre_journal": "International Journal of Advanced Robotic Systems", "nbpubli": 1, "nbchercheur": 4}}
 
   var identifiant = {} ;
   var id = 0 ;
@@ -35,7 +50,7 @@
   var tabNoteNbpubli = [] ;
   for(var numjournal in data) {
     var i = 0 ;
-    
+
     var n = tabNoteNbpubli.length ;
     while(i<n&&(data[numjournal]['note']!=tabNoteNbpubli[i][0]||data[numjournal]['nbchercheur']!=tabNoteNbpubli[i][1])){
       i = i + 1 ;
@@ -50,148 +65,164 @@
 
   </script>
 
-    <script>
-    var padding = 25;
+  <script>
+  var padding = 80;
 
 
-    var dataset = [] ;
-    for (var numjournal in data){
-      dataset.push([data[numjournal]['note'],data[numjournal]['nbpubli'],data[numjournal]['nbchercheur']
-      ,data[numjournal]['moyfideliteauteur'],data[numjournal]['titre_journal']]);
+  var dataset = [] ;
+  for (var numjournal in data){
+    dataset.push([data[numjournal]['note'],data[numjournal]['nbpubli'],data[numjournal]['nbchercheur']
+    ,data[numjournal]['moyfideliteauteur'],data[numjournal]['titre_journal']]);
+  }
+
+  function compare(data1, data2) {
+    if (data1[0]<data2[0])
+    return -1;
+    if (data1[0]>data2[0])
+    return 1;
+    return 0;
+  }
+
+  var tooltipSphere = d3.tip()
+  .attr('class', 'd3-tip')
+  .offset([-10, 0])
+  .html(function(d) {
+    return d[4];
+  });
+
+  var tooltipYaxis = d3.tip()
+  .attr('class', 'd3-tip')
+  .offset([-10, 0])
+  .html("chercheurs publiant dans le journal");
+
+  var tooltipSphereClique = d3.tip()
+  .attr('class', 'd3-tip')
+  .offset([-10, 0])
+  .html(function(d) {
+    return (d[4] + ", note="+d[0]+", nombre de publication =" + d[1]);
+  });
+
+  dataset = dataset.sort(compare);
+
+  var minNbPubli = dataset[0][1] ;
+  var maxNbPubli = dataset[0][1] ;
+
+  var minNbChercheur = dataset[0][2] ;
+  var maxNbChercheur= dataset[0][2] ;
+
+  var minMoyFidelite = dataset[0][3] ;
+  var maxMoyFidelite= dataset[0][3] ;
+
+
+
+  for(var i = 0; i<dataset.length ; i++ ){
+    if(minNbPubli>dataset[i][1]){
+      minNbPubli = dataset[i][1] ;
     }
-
-    var minNbPubli = dataset[0][1] ;
-    var maxNbPubli = dataset[0][1] ;
-
-    var minNbChercheur = dataset[0][2] ;
-    var maxNbChercheur= dataset[0][2] ;
-
-    var minMoyFidelite = dataset[0][3] ;
-    var maxMoyFidelite= dataset[0][3] ;
-
-
-
-    for(var i = 0; i<dataset.length ; i++ ){
-      if(minNbPubli>dataset[i][1]){
-        minNbPubli = dataset[i][1] ;
-      }
-      if(minNbChercheur>dataset[i][2]){
-        minNbChercheur = dataset[i][2] ;
-      }
-      if(minMoyFidelite>dataset[i][3]){
-        minMoyFidelite = dataset[i][3] ;
-      }
-      if(maxNbPubli<dataset[i][1]){
-        maxNbPubli = dataset[i][1] ;
-      }
-      if(maxNbChercheur<dataset[i][2]){
-        maxNbChercheur = dataset[i][2] ;
-      }
-      if(maxMoyFidelite<dataset[i][3]){
-        maxMoyFidelite = dataset[i][3] ;
-      }
+    if(minNbChercheur>dataset[i][2]){
+      minNbChercheur = dataset[i][2] ;
     }
+    if(minMoyFidelite>dataset[i][3]){
+      minMoyFidelite = dataset[i][3] ;
+    }
+    if(maxNbPubli<dataset[i][1]){
+      maxNbPubli = dataset[i][1] ;
+    }
+    if(maxNbChercheur<dataset[i][2]){
+      maxNbChercheur = dataset[i][2] ;
+    }
+    if(maxMoyFidelite<dataset[i][3]){
+      maxMoyFidelite = dataset[i][3] ;
+    }
+  }
 
-    var maxAbscisse = 4 ;
-    var maxOrdonne = 15 ;
-    var largeur = 1200 ;
-    var hauteur = 400 ;
-    var largeurGraph = largeur*0.75 ;
+  var maxAbscisse = 4 ;
+  var maxOrdonne = 15 ;
+  var largeur = 1200 ;
+  var hauteur = 400 ;
+  var largeurGraph = largeur*1 ;
 
-    var colorScale = d3.scale.linear()
-      .domain([minMoyFidelite,maxMoyFidelite])
-      .range([255,0]);
+  var colorScale = d3.scale.linear()
+  .domain([minMoyFidelite,maxMoyFidelite])
+  .range([255,0]);
 
-    var rScale = d3.scale.linear()
-      .domain([minNbPubli,maxNbPubli])
-      .range([10,30]);
+  var rScale = d3.scale.linear()
+  .domain([minNbPubli,maxNbPubli])
+  .range([20,50]);
 
-    var legendScale = d3.scale.linear()
-      .domain([0,dataset.length-1])
-      .range([hauteur-padding,0+padding]);
+  var legendScale = d3.scale.linear()
+  .domain([0,dataset.length-1])
+  .range([hauteur-padding,0+padding]);
 
-    var xScale = d3.scale.linear()
-                        .domain([0,maxAbscisse])
-                        .range([0+padding,largeurGraph-padding]);
-    var yScale=  d3.scale.linear()
-                        .domain([minNbChercheur,maxNbChercheur])
-                        .range([hauteur-padding,0+padding]);
-    var svg = d3.select("body")
-                .append("svg")
-                .attr("width", largeur)
-                .attr("height",hauteur);
+  var xScale = d3.scale.linear()
+  .domain([0,dataset.length])
+  .range([0+padding,largeurGraph-padding]);
+  var yScale=  d3.scale.linear()
+  .domain([0,maxNbChercheur])
+  .range([hauteur-padding,0+padding]);
 
-    var legend = svg.append("g")
-      .attr("class", "legend")
-      .attr("x", largeurGraph)
-      .attr("y", 0)
-      .attr("height",hauteur)
-      .attr("width", largeur - largeurGraph);
-
-    svg.selectAll("circle")
-       .data(dataset)
-       .enter()
-       .append("circle")
-       .attr("cx",function(d){
-         return xScale(d[0]);
-       })
-       .attr("cy", function(d){
-         return yScale(d[2]);
-       })
-       .attr("r",function(d){
-         return rScale(d[1]);
-       })
-       .attr("fill", function(d) {
-         return "rgb(0, 0, " + colorScale(d[3]) + ")";
-        });
+  var svg = d3.select("body")
+  .append("svg")
+  .attr("width", largeur)
+  .attr("height",hauteur)
+  .call(tooltipSphere)
+  .call(tooltipSphereClique)
+  .call(tooltipYaxis);
 
 
-       svg.selectAll("text")
-          .data(tabNoteNbpubli)
-          .enter()
-          .append("text")
-          .attr("x",function(d){
-            return xScale(d[0]);
-          })
-          .attr("y", function(d){
-            return yScale(d[1]);
-          })
-          .text(function(d,i){return d[2];})
-          .attr("fill", "red");
+  svg.selectAll("circle")
+  .data(dataset)
+  .enter()
+  .append("circle")
+  .attr("cx",function(d,i){
+    return xScale(i+1);
+  })
+  .attr("cy", function(d){
+    return yScale(d[2]);
+  })
+  .attr("r",function(d){
+    return rScale(d[1]);
+  })
+  .attr("fill", function(d) {
+    return "rgb(0, 0, " + colorScale(d[3]) + ")";
+  })
+  .on('mouseover', tooltipSphere.show)
+  .on('mouseout', tooltipSphere.hide,tooltipSphereClique.hide )
+  .on('click',tooltipSphereClique.show);
 
 
-    legend.selectAll("text")
-      .data(dataset)
-      .enter()
-      .append("text")
-      .attr("x",function(d){ return padding+largeurGraph;})
-      .attr("y",function(d,i){ return legendScale(i);})
-      .text(function(d,i){return "num:"+i+" "+d[4];})
-      .attr("font-family", "sans-serif")
-      .attr("font-size", "11px")
-      .attr("fill", "red");
-
-var xAxis =d3.svg.axis()
-             .scale(xScale)   //necessary
-             .orient("bottom")  //xAxis horizontal ... bottom
-             .ticks(5);
-
-var yAxis = d3.svg.axis()
-              .scale(yScale)
-              .orient("left")
-              .ticks(10);
-
-    svg.append("g")
-       .attr("class", "axis")
-       .attr("transform", "translate(0," + (hauteur-padding) + ")" )
-       .call(xAxis);
-
-    svg.append("g")
-       .attr("class", "axis")
-       .attr("transform", "translate(" + padding + ",0)" )
-       .call(yAxis);
+  var xAxis =d3.svg.axis()
+  .scale(xScale)   //necessary
+  .orient("bottom")  //xAxis horizontal ... bottom
+  .ticks(0);
 
 
-    </script>
-  </body>
+  var yAxis = d3.svg.axis()
+  .scale(yScale)
+  .orient("left")
+  .ticks(10);
+
+
+  svg.append("g")
+  .attr("class", "axis")
+  .attr("transform", "translate(0," + (hauteur-padding) + ")" )
+  .call(xAxis);
+
+  svg.append("g")
+  .attr("class", "axis")
+  .attr("transform", "translate(" + padding + ",0)" )
+  .call(yAxis)
+  .on('click', tooltipYaxis.show)
+  .on('mouseout', tooltipYaxis.hide);
+
+  svg.append("text")
+  .attr("x",largeurGraph/2)
+  .attr("y",hauteur-40)
+  .style("text-anchor", "middle")
+  .text("triés par note décroissante");
+
+
+
+  </script>
+</body>
 </html>
